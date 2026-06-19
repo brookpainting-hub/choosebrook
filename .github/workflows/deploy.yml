@@ -1,0 +1,33 @@
+name: Deploy Lovable App to InMotion
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Node.js & Build
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        
+    - name: Install Dependencies & Compile
+      run: |
+        npm install
+        npm run build
+
+    - name: Deploy to InMotion via SFTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.INMOTION_HOST }}
+        username: ${{ secrets.INMOTION_USERNAME }}
+        password: ${{ secrets.INMOTION_PASSWORD }}
+        port: 2222
+        local-dir: ./dist/
+        server-dir: ./public_html/vision-truth-engine/
